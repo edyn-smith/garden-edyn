@@ -1,4 +1,5 @@
 # 🌿 Garden of Edyn Photography
+https://edyn-smith.github.io/garden-edyn/
 
 ### 1. Add Your Photos
 
