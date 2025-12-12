@@ -7,8 +7,6 @@ const navMenu = document.querySelector('.nav-menu');
 if (hamburger) {
     hamburger.addEventListener('click', () => {
         navMenu.classList.toggle('active');
-        
-        // Animate hamburger to X
         hamburger.classList.toggle('active');
     });
 
@@ -20,6 +18,16 @@ if (hamburger) {
         });
     });
 }
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (navMenu && navMenu.classList.contains('active')) {
+        if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
+            navMenu.classList.remove('active');
+            hamburger.classList.remove('active');
+        }
+    }
+});
 
 // ===================================
 // Lightbox Functionality
@@ -137,28 +145,28 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // ===================================
-// Scroll Animation for Elements
+// Enhanced Scroll Animation for Elements
 // ===================================
 const observerOptions = {
     threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    rootMargin: '0px 0px -80px 0px'
 };
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+const animateOnScroll = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
+            // Add staggered delay based on element position
+            const delay = index * 0.1;
+            entry.target.style.transitionDelay = `${delay}s`;
+            entry.target.classList.add('visible');
+            animateOnScroll.unobserve(entry.target);
         }
     });
 }, observerOptions);
 
-// Observe photo items for fade-in animation
-document.querySelectorAll('.photo-item, .category-card').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
+// Observe elements for fade-in animation
+document.querySelectorAll('.photo-item, .category-card, .about-text').forEach(el => {
+    animateOnScroll.observe(el);
 });
 
 // ===================================
@@ -170,36 +178,75 @@ const navbar = document.querySelector('.navbar');
 window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
     
-    if (currentScroll <= 0) {
-        navbar.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
-    } else {
-        navbar.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+    if (navbar) {
+        if (currentScroll > 100) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
     }
     
     lastScroll = currentScroll;
 });
 
 // ===================================
-// Lazy Loading Images (Enhanced)
+// Parallax Effect for Hero
 // ===================================
-if ('loading' in HTMLImageElement.prototype) {
-    // Browser supports lazy loading
-    const images = document.querySelectorAll('img[loading="lazy"]');
-    images.forEach(img => {
-        img.src = img.src;
+const hero = document.querySelector('.hero');
+if (hero) {
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const heroHeight = hero.offsetHeight;
+        
+        if (scrolled < heroHeight) {
+            // Limit parallax range to prevent showing edges
+            const parallaxSpeed = 0.3;
+            const maxOffset = 150; // Maximum pixels to shift
+            const offset = Math.min(scrolled * parallaxSpeed, maxOffset);
+            hero.style.backgroundPosition = `center calc(30% + ${offset}px)`;
+        }
     });
-} else {
-    // Fallback for browsers that don't support lazy loading
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js';
-    document.body.appendChild(script);
 }
+
+// ===================================
+// Image Lazy Loading with Fade-in
+// ===================================
+const images = document.querySelectorAll('img');
+images.forEach(img => {
+    if (img.complete) {
+        img.classList.add('loaded');
+    } else {
+        img.addEventListener('load', () => {
+            img.classList.add('loaded');
+        });
+    }
+});
 
 // ===================================
 // Add loading animation
 // ===================================
 window.addEventListener('load', () => {
     document.body.classList.add('loaded');
+    
+    // Trigger initial animations after page load
+    setTimeout(() => {
+        document.querySelectorAll('.photo-item, .category-card').forEach((el, index) => {
+            el.style.transitionDelay = `${index * 0.08}s`;
+        });
+    }, 100);
+});
+
+// ===================================
+// Smooth hover sound effect (optional enhancement)
+// ===================================
+document.querySelectorAll('.category-card, .photo-item, .cta-button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+        el.style.willChange = 'transform';
+    });
+    
+    el.addEventListener('mouseleave', () => {
+        el.style.willChange = 'auto';
+    });
 });
 
 console.log('🌿 Garden of Edyn Photography - Website loaded successfully!');
