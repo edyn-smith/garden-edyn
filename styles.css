@@ -579,8 +579,19 @@ a {
     .nav-container {
         padding: 1rem;
     }
+    
     .hero {
         background-image: url('images/hero-mobile.jpg');
+        background-size: cover;          /* ensure it fills the box */
+        background-position: center;     /* center focal point */
+        background-repeat: no-repeat;
+        background-attachment: scroll;   /* disable fixed on mobile (fixes rendering issues) */
+        height: 60vh;                    /* reduce full-viewport height for better cropping */
+        min-height: 320px;               /* avoids being too small on very short screens */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
     }
 
     .hero-title {
